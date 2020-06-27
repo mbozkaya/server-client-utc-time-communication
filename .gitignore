@@ -1,0 +1,21 @@
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+*.cache
+*.suo
+*.json
+*.props
+*.pdb
+*.exe
+DistributedApi/.dockerignore
+*.dll
+*.xml
+*.v2
+*.csproj
+*.user
+DistributedApi/obj/Debug/netcoreapp3.1/DistributedApi.AssemblyInfo.cs
+*.txt
+*.targets
+DistributedApi/obj/Debug/netcoreapp3.1/.NETCoreApp,Version=v3.1.AssemblyAttributes.cs
