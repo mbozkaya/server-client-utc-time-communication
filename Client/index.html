@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Datetime Localization</title>
+</head>
+
+<body>
+    <p>Your Default GMT Zone : <span id="gmtZone"></span></p>
+    <p>Current Server Time : <span id="serverTime"></span></p>
+    <p>Response Time in Your Time Zone : <span id="transactionTime"></span></p>
+
+    <form action="#">
+        <input type="number" name="year" max="9999" min="0" placeholder="year" required>
+        <input type="number" name="month" max="12" min="0" placeholder="month" required>
+        <input type="number" name="day" max="31" min="0" placeholder="day" required>
+        <input type="number" name="hour" max="59" min="0" placeholder="hour">
+        <input type="number" name="minute" max="59" min="0" placeholder="minute">
+        <input type="number" name="second" max="59" min="0" placeholder="second">
+        <input type="submit">
+    </form>
+
+    <script>
+
+        const page = {
+            apiUrl: 'https://localhost:32768/date',
+            getGMTZone: function () {
+                return (new Date().getTimezoneOffset() / 60) * -1;
+            },
+            serverTime: function () {
+                const date = new Date();
+                return new Date(new Date(this * 1000).getTime() + date.getTimezoneOffset() * 60000);
+            },
+            timestampToDate: function () {
+                const date = new Date();
+                return new Date(this * 1000);
+            },
+            init: function () {
+                Number.prototype.timestampToDate = page.timestampToDate;
+                Number.prototype.serverTime = page.serverTime;
+                document.addEventListener("DOMContentLoaded", function (event) {
+                    fetch(`${page.apiUrl}/get`)
+                        .then(response => response.json())
+                        .then(response => {
+                            document.querySelector('#serverTime').innerHTML = Number(response).serverTime().toLocaleString(navigator.language);
+                            document.querySelector('#transactionTime').innerHTML = Number(response).timestampToDate().toLocaleString(navigator.language);
+                        });
+
+                    document.querySelector('#gmtZone').innerHTML = `GMT ${page.getGMTZone()}`;
+
+                    const yesterday = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
+                    document.querySelector('input[name="year"]').value = yesterday.getFullYear();
+                    document.querySelector('input[name="month"]').value = yesterday.getMonth() + 1;
+                    document.querySelector('input[name="day"]').value = yesterday.getDay();
+
+
+                    document.querySelector('form').addEventListener('submit', function (e) {
+
+                        var model = {
+                            year: parseInt(document.querySelector('input[name="year"]').value),
+                            month: parseInt(document.querySelector('input[name="month"]').value),
+                            day: parseInt(document.querySelector('input[name="day"]').value),
+                            hour: parseInt(document.querySelector('input[name="hour"]').value) || 0,
+                            minute: parseInt(document.querySelector('input[name="minute"]').value) || 0,
+                            second: parseInt(document.querySelector('input[name="second"]').value) || 0,
+                        };
+
+                        fetch(`${page.apiUrl}/custom`,
+                            {
+                                method: 'POST',
+                                body: JSON.stringify(model),
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json'
+                                },
+                            }
+                        )
+                            .then(response => response.json())
+                            .then(response => {
+                                document.querySelector('#serverTime').innerHTML = Number(response).serverTime().toLocaleString(navigator.language);
+                                document.querySelector('#transactionTime').innerHTML = Number(response).timestampToDate().toLocaleString(navigator.language);
+                            });
+                        return false;
+                    });
+
+                });
+            },
+        }
+        page.init();
+
+    </script>
+
+
+</body>
+
+</html>

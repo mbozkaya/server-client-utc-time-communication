@@ -15,7 +15,7 @@ namespace DistributedApi.Controllers
         [HttpGet("Get")]
         public IActionResult Get() => Ok(DateTime.Now.LocalizeTimeStamp());
 
-        [HttpGet("Custom")]
-        public IActionResult Custom(int year, int month, int day) => Ok(new DateTime(year, month, day).LocalizeTimeStamp());
+        [HttpPost("Custom")]
+        public IActionResult Custom(DTO.PostDto model) => Ok(new DateTime(model.Year, model.Month, model.Day, model.Hour, model.Minute, model.Second).LocalizeTimeStamp());
     }
 }
